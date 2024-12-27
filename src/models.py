@@ -4,15 +4,13 @@ from sqlalchemy import BigInteger, Column
 from sqlmodel import Field, Relationship, SQLModel
 
 
-class ClaimBase(SQLModel):
-    name: str
 
-class Claim(ClaimBase, table=True):
-    uid: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    claims_process: list["ClaimProcess"] = Relationship(back_populates="claim")
+class Claim(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    claims_process: list["ClaimItem"] = Relationship(back_populates="claim")
 
 
-class ClaimProcessBase(SQLModel):
+class ClaimItemBase(SQLModel):
     service_date: datetime
     submitted_procedure: str
     quadrant: str | None = None
@@ -22,14 +20,11 @@ class ClaimProcessBase(SQLModel):
     provider_fees: float
     allowed_fees: float
     member_coinsurance: float
-    member_copay: float
-    claim_uid: uuid.UUID
-    net_fee: float
+    member_copay: float    
+    net_fee: float | None = None
 
 
-class ClaimProcess(ClaimProcessBase, table=True):
-    #__tablename__ = "books"
-
+class ClaimItem(ClaimItemBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    claim_uid: uuid.UUID | None = Field(default=None, foreign_key="claim.uid")
-    claim: Claim | None = Relationship(back_populates="claims_process")
+    claim_uid: uuid.UUID = Field(foreign_key="claim.id")
+    claim: Claim = Relationship(back_populates="claims_process")

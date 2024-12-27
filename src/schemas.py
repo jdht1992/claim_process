@@ -3,23 +3,19 @@ import uuid
 from pydantic import field_validator
 from sqlmodel import SQLModel
 
-from src.models import ClaimBase, ClaimProcessBase
+from src.models import ClaimItemBase
 
 
-class ClaimCreateSchema(ClaimBase):
-    pass
-
-
-
-class ClaimProcess(ClaimProcessBase):
+class ClaimItemSchema(ClaimItemBase):
+    claim_uid: uuid.UUID | None = None
 
     @field_validator('service_date', mode='before') 
     def validate_service_date(cls, value): 
         if isinstance(value, str): 
             try: # Try parsing the date string 
-                return datetime.strptime(value, "%m/%d/%y %H:%M") 
+                return datetime.strptime("2024-12-12 14:00", "%Y-%m-%d %H:%M")
             except ValueError: 
-                raise ValueError('service_date must be in the format MM/DD/YY HH:MM') 
+                raise ValueError('service_date must be in the format YYYY/MM/DD HH:MM') 
         return value
     
     @field_validator('submitted_procedure', mode='before') 
@@ -34,7 +30,3 @@ class ClaimProcess(ClaimProcessBase):
         if len(str_value) != 10: 
             raise ValueError('provider_npi must be exactly 10 digits long') 
         return value
-    
-
-class ClaimProcessCreateSchema(SQLModel):
-    cliam: list[ClaimProcess]
