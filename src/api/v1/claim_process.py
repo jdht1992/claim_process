@@ -2,19 +2,13 @@ from fastapi import APIRouter, status
 from sqlmodel import select
 
 from src.models import ClaimProcess
-from src.schemas import ClaimProcessCreateSchema, ClaimProcessSchema
+from src.schemas import ClaimProcessCreateSchema
 from db import SessionDep
 
 router = APIRouter()
 
 
-"""
-@router.get("/", status_code=status.HTTP_200_OK, response_model=list[ClaimProcessSchema])
-async def list_claim(session: SessionDep):
-    return session.exec(select(ClaimProcess)).all()
-"""
-
-@router.get("/", status_code=status.HTTP_200_OK)
+@router.get("/", status_code=status.HTTP_200_OK, response_model=list[ClaimProcess])
 async def list_claim(session: SessionDep):
     return session.exec(select(ClaimProcess)).all()
 

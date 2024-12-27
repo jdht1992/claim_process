@@ -3,30 +3,12 @@ import uuid
 from pydantic import field_validator
 from sqlmodel import SQLModel
 
+from src.models import ClaimBase, ClaimProcessBase
 
-class ClaimBase(SQLModel):
-    name: str
-
-class ClaimSchema(ClaimBase):
-    uid: uuid.UUID
 
 class ClaimCreateSchema(ClaimBase):
     pass
 
-
-class ClaimProcessBase(SQLModel):
-    service_date: datetime
-    submitted_procedure: str
-    quadrant: str | None = None
-    plan: str
-    subscriber: int
-    provider_npi: int
-    provider_fees: float
-    allowed_fees: float
-    member_coinsurance: float
-    member_copay: float
-    claim_uid: uuid.UUID
-    net_fee: float
 
 
 class ClaimProcess(ClaimProcessBase):
@@ -53,9 +35,6 @@ class ClaimProcess(ClaimProcessBase):
             raise ValueError('provider_npi must be exactly 10 digits long') 
         return value
     
-class ClaimProcessSchema(ClaimProcessBase):
-    uid: uuid.UUID
-    # claim_uid: ClaimSchema
 
 class ClaimProcessCreateSchema(SQLModel):
     cliam: list[ClaimProcess]

@@ -2,7 +2,7 @@ from fastapi import APIRouter, status
 from sqlmodel import select
 
 from src.models import Claim
-from src.schemas import ClaimCreateSchema, ClaimSchema
+from src.schemas import ClaimCreateSchema
 from db import SessionDep
 
 
@@ -13,7 +13,7 @@ async def list_customer(session: SessionDep):
     return session.exec(select(Claim)).all()
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ClaimSchema)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Claim)
 async def create_customer(claim_data: ClaimCreateSchema, session: SessionDep):
     customer = Claim.model_validate(claim_data.model_dump())
     session.add(customer)
