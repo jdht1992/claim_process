@@ -1,22 +1,27 @@
-version: '3'
-
 services:
   db:
-      image: postgres
-      restart: always
-      volumes:
-        - postgres_data:/var/lib/postgresql/data/
-      environment:
-        - POSTGRES_USER=postgres
-        - POSTGRES_PASSWORD=postgres1234
-        - POSTGRES_DB=claim
-      ports:
+    image: postgres
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres1234
+      - POSTGRES_DB=claim
+    ports:
       - "5436:5432"
-  #redis:
-  #  image: redis
-  #  restart: always
-  #  ports:
-  #    - '6371:6379'
-   
+
+  pgweb:
+    container_name: pgweb
+    image: sosedoff/pgweb
+    ports:
+      - "8081:8081"
+    links:
+      - db:postgres
+    environment:
+      - PGWEB_DATABASE_URL=postgresql://postgres:postgres1234@db:5432/claim?sslmode=disable
+    depends_on:
+      - db
+
 volumes:
-      postgres_data: 
+  postgres_data:
