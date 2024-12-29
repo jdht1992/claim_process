@@ -28,3 +28,11 @@ class ClaimItem(ClaimItemBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     claim_uid: uuid.UUID = Field(foreign_key="claim.id")
     claim: Claim = Relationship(back_populates="claims_process")
+
+
+class ProviderAverage(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)    
+    provider_npi: int = Field(sa_column=Column(BigInteger, unique=True))
+    items: int = 0
+    total: float = 0
+    average: float = 0
