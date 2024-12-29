@@ -1,3 +1,5 @@
 fastapi
 sqlmodel
 pydantic_settings
+fastapi[standard]
+psycopg2-binary

@@ -9,7 +9,7 @@ from db import SessionDep
 router = APIRouter()
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Claim)
 def create_claim(claim_items: list[ClaimItemSchema], session: SessionDep):
     calculator = Calculator(session=session)
 
@@ -27,4 +27,4 @@ def create_claim(claim_items: list[ClaimItemSchema], session: SessionDep):
     # TODO This call needs to be move to a background process for avoid block the request.
     calculator.calculate_net_fee(claim=claim)
     
-    return {}
+    return claim
