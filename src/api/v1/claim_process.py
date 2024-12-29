@@ -1,24 +1,27 @@
+import logging
 from fastapi import APIRouter, status
 from sqlmodel import select
 
 from src.models import Claim, ClaimItem
-from src.schemas import ClaimItemSchema
+from src.schemas import ClaimItemSchema, ClaimSchema
 from src.api.v1.calculator import Calculator
 from db import SessionDep
 
 router = APIRouter()
+logger = logging.getLogger()
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Claim)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ClaimSchema)
 def create_claim(claim_items: list[ClaimItemSchema], session: SessionDep):
     calculator = Calculator(session=session)
 
     claim = Claim()
     session.add(claim)
     session.commit()
+    session.refresh(claim)
     print(f"Created claim with id {claim.id}")
 
-    for item in claim_items:
+    for item in claim_items:        
         item.claim_uid = claim.id
         item = ClaimItem.model_validate(item)
         session.add(item)
