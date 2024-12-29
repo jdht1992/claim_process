@@ -27,3 +27,6 @@ content-type: application/json
         "member_copay": 0        
     }
 ]
+
+GET http://localhost:8000/api/v1/providers
+content-type: application/json

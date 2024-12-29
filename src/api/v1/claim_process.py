@@ -10,14 +10,6 @@ from db import SessionDep
 router = APIRouter()
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=List[ProviderAverage])
-def get_providers(session: SessionDep):
-    statement = select(ProviderAverage).order_by(ProviderAverage.average).limit(1)
-    providers = session.exec(statement).all()
-
-    return providers
-
-
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Claim)
 def create_claim(claim_items: list[ClaimItemSchema], session: SessionDep):
     calculator = Calculator(session=session)

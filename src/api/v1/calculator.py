@@ -1,11 +1,14 @@
+import redis
+import json
 from src.models import Claim, ProviderAverage
-from db import get_session, SessionDep
+from db import SessionDep
 from sqlmodel import select
+from publisher import publish
 
 
 class Calculator:
     def __init__(self, session: SessionDep):
-        self._session = session
+        self._session = session        
         
 
     def calculate_net_fee(self, claim: Claim):
@@ -19,7 +22,10 @@ class Calculator:
             provider_average.average = provider_average.total / provider_average.items            
 
             self._session.add(provider_average)
-            self._session.commit()            
+            self._session.commit()
+            self._session.refresh(provider_average)
+
+            publish(provider_average.model_dump_json())
 
     def _get_provider_average(self, provider_npi: int):
         
@@ -37,3 +43,4 @@ class Calculator:
         self._session.commit()
 
         return provider_average
+    

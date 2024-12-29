@@ -20,6 +20,18 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'
+
+  payment:
+    build: .
+    tty: true 
+    command: python subscriber.py
+    depends_on:
+      - redis
+
   pgweb:
     container_name: pgweb
     image: sosedoff/pgweb
