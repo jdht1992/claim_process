@@ -1,5 +1,5 @@
 services:
-  api:
+  claim_process:
     build: .
     command: uvicorn main:app --host 0.0.0.0 --reload
     volumes:
@@ -8,6 +8,7 @@ services:
       - 8000:8000
     depends_on:
       - db
+
   db:
     image: postgres
     restart: always
