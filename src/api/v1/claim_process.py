@@ -1,24 +1,30 @@
-import logging
+from typing import List
 from fastapi import APIRouter, status
 from sqlmodel import select
 
-from src.models import Claim, ClaimItem
-from src.schemas import ClaimItemSchema, ClaimSchema
+from src.models import Claim, ClaimItem, ProviderAverage
+from src.schemas import ClaimItemSchema
 from src.api.v1.calculator import Calculator
 from db import SessionDep
 
 router = APIRouter()
-logger = logging.getLogger()
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ClaimSchema)
+@router.get("/", status_code=status.HTTP_200_OK, response_model=List[ProviderAverage])
+def get_providers(session: SessionDep):
+    statement = select(ProviderAverage).order_by(ProviderAverage.average).limit(1)
+    providers = session.exec(statement).all()
+
+    return providers
+
+
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Claim)
 def create_claim(claim_items: list[ClaimItemSchema], session: SessionDep):
     calculator = Calculator(session=session)
 
     claim = Claim()
     session.add(claim)
     session.commit()
-    session.refresh(claim)
     print(f"Created claim with id {claim.id}")
 
     for item in claim_items:        
@@ -30,4 +36,5 @@ def create_claim(claim_items: list[ClaimItemSchema], session: SessionDep):
     # TODO This call needs to be move to a background process for avoid block the request.
     calculator.calculate_net_fee(claim=claim)
     
+    session.refresh(claim)
     return claim

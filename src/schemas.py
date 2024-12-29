@@ -30,8 +30,3 @@ class ClaimItemSchema(ClaimItemBase):
         if len(str_value) != 10: 
             raise ValueError('provider_npi must be exactly 10 digits long') 
         return value
-    
-    
-class ClaimSchema(SQLModel):
-    id: uuid.UUID
-    
