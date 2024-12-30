@@ -1,17 +1,17 @@
 from typing import List
-
 from fastapi import APIRouter, status
+from sqlmodel import select
 
-from db import SessionDep
-from src.api.v1.calculator import Calculator
-from src.models import Claim, ClaimItem
+from src.models import Claim, ClaimItem, ProviderAverage
 from src.schemas import ClaimItemSchema
+from src.api.v1.calculator import Calculator
+from db import SessionDep
 
 router = APIRouter()
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Claim)
-def create_claim(claim_items: List[ClaimItemSchema], session: SessionDep):
+def create_claim(claim_items: list[ClaimItemSchema], session: SessionDep):
     calculator = Calculator(session=session)
 
     claim = Claim()
