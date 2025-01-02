@@ -1,10 +1,15 @@
+from logging import INFO, basicConfig, getLogger
 from math import ceil
+from typing import AsyncGenerator
 from fastapi_limiter import FastAPILimiter
 import redis.asyncio as redis
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request, Response, status
 from db import create_all_tables
 from src.api.router import v1_router
+
+logger = getLogger(__name__)
+basicConfig(level=INFO)
 
 
 async def service_name_identifier(request: Request):
@@ -28,7 +33,17 @@ async def custom_callback(request: Request, response: Response, pexpire: int):
     )
 
 @asynccontextmanager
-async def app_lifespan(app: FastAPI):
+async def app_lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """
+    A generator function that handles the lifespan events of the FastAPI application.
+
+    Args:
+        app (FastAPI): The FastAPI application instance.
+
+    Yields:
+        None: This function is a generator and yields None.
+
+    """
     redis_connection = redis.from_url("redis://redis:6379/0", encoding="utf8")
     await FastAPILimiter.init(
         redis=redis_connection,
@@ -36,7 +51,7 @@ async def app_lifespan(app: FastAPI):
         http_callback=custom_callback,
     )
 
-    print("init lifespan")
+    logger.info("Starting up...")
     create_all_tables()
     yield
     await FastAPILimiter.close()

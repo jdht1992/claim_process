@@ -31,3 +31,7 @@ archive.zip
 
 ### Environments
 *.env
+
+
+# ruff
+.ruff_cache/

@@ -9,9 +9,10 @@ from sqlmodel import select
 from db import SessionDep
 from src.models import ProviderAverage
 
-redis_client = redis.Redis(host='redis', port=6379, db=0)
+redis_client = redis.Redis(host="redis", port=6379, db=0)
 
 router = APIRouter()
+
 
 # Custom JSON encoder to handle UUIDs
 class UUIDEncoder(json.JSONEncoder):
@@ -21,8 +22,16 @@ class UUIDEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-@router.get("/", status_code=status.HTTP_200_OK, dependencies=[Depends(RateLimiter(times=10, seconds=60))])
+@router.get(
+    "/",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
+)
 def get_providers(session: SessionDep):
+    print("====################---------------")
+    print(type(session))
+    print(session)
+
     cached_providers = redis_client.get("providers")
 
     if cached_providers:
@@ -30,10 +39,9 @@ def get_providers(session: SessionDep):
 
     statement = select(ProviderAverage).order_by(ProviderAverage.average).limit(10)
     providers = session.exec(statement).all()
-    
 
-    providers = json.dumps([row.model_dump() for row in providers], cls=UUIDEncoder)
+    providers = json.dumps([row.dict() for row in providers], cls=UUIDEncoder)
 
-    redis_client.set(f"providers", 60, providers)
+    redis_client.set("providers", providers, ex=60)
 
-    return providers
+    return json.loads(providers)

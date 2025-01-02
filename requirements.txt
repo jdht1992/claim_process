@@ -4,3 +4,7 @@ pydantic_settings
 sqlmodel
 redis==5.2.1
 fastapi-limiter
+pytest
+black
+ruff
+isort
